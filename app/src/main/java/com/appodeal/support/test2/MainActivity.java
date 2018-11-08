@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.btnRewardedVideo:
                 counterVideos++;
                 coins += 10;
-                if (counterVideos >= 0) {
+                if (counterVideos >= 3) {
                     btnNative.setEnabled(true);
                 }
                 Appodeal.show(this,Appodeal.REWARDED_VIDEO);
@@ -113,18 +113,5 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Appodeal.show(this,Appodeal.NATIVE);
                 break;
         }
-    }
-    protected void onSaveInstanceState(Bundle countBanners) {
-        super.onSaveInstanceState(countBanners);
-        countBanners.putInt("countBanner", counterBanners);
-        countBanners.putInt("countVideo", counterVideos);
-        Log.d(LOG_TAG, "onSaveInstanceState");
-    }
-
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        counterBanners = savedInstanceState.getInt("countBanner");
-        counterVideos = savedInstanceState.getInt("countVideo");
-        Log.d(LOG_TAG, "onRestoreInstanceState");
     }
 }
