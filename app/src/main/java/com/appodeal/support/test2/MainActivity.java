@@ -3,12 +3,16 @@ package com.appodeal.support.test2;
 import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.appodeal.ads.Appodeal;
 import com.appodeal.ads.NativeAd;
 import com.appodeal.ads.native_ad.views.NativeAdViewNewsFeed;
+
+import static com.mobvista.msdk.out.MVConfiguration.LOG_TAG;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -20,7 +24,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public static int adDelay = 30;
     public CountDownTimer cdt;
     int counterBanners;
-    public static Boolean interstitialPermissionOn;
+    int counterVideos;
+    int coins;
+    public static Boolean interstitialPermissionOn = false ;
     public int reward;
 
     @Override
@@ -42,8 +48,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Appodeal.disableLocationPermissionCheck();
         Appodeal.initialize(this, appKey, Appodeal.INTERSTITIAL | Appodeal.REWARDED_VIDEO | Appodeal.BANNER_TOP | Appodeal.NATIVE);
 
-        MyBannerCallBacks.init();
-
         btnInterstitials.setEnabled(false);;
         MyInterstitialsCallBacks.init(this);
 
@@ -53,8 +57,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnNative.setEnabled(false);
         MyNativeCallBacks.init(this);
 
+        MyBannerCallBacks.init(this);
 
-        final MainActivity mainAct = this;
         this.cdt = new CountDownTimer(adDelay * 1000, 1000) {
 
             public void onTick(long millisUntilFinished) {}
@@ -65,6 +69,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }.start();
 
     }
+
 
     @Override
     public void onResume() {
@@ -79,7 +84,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.btnBanners:
                 Appodeal.show(this, Appodeal.BANNER_TOP);
                 counterBanners++;
-                if (counterBanners >= 7) {
+                if (counterBanners >= 7 && interstitialPermissionOn == true ) {
                     btnInterstitials.setEnabled(true);
                 }
 
@@ -88,17 +93,38 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (interstitialPermissionOn) {
                     Appodeal.show(this, Appodeal.INTERSTITIAL);
                     interstitialPermissionOn = false;
+                    btnInterstitials.setEnabled(false);
                     cdt.start();
                 }
                 break;
             case R.id.btnRewardedVideo:
-
+                counterVideos++;
+                coins += 10;
+                if (counterVideos >= 0) {
+                    btnNative.setEnabled(true);
+                }
+                Appodeal.show(this,Appodeal.REWARDED_VIDEO);
+                Toast toast = Toast.makeText(this, "You received " + coins + " coins",Toast.LENGTH_LONG);
+                toast.show();
                 break;
             case R.id.btnNative:
-                NativeAd mNativeAd = Appodeal.getNativeAds(1).get(0);
-                NativeAdViewNewsFeed nav_nf = (NativeAdViewNewsFeed)findViewById(R.id.native_ad_view_news_feed);
-                nav_nf.setNativeAd(mNativeAd);
+                Appodeal.hide(this, Appodeal.BANNER_TOP);
+                findViewById(R.id.listView).setVisibility(View.VISIBLE);
+                Appodeal.show(this,Appodeal.NATIVE);
                 break;
         }
+    }
+    protected void onSaveInstanceState(Bundle countBanners) {
+        super.onSaveInstanceState(countBanners);
+        countBanners.putInt("countBanner", counterBanners);
+        countBanners.putInt("countVideo", counterVideos);
+        Log.d(LOG_TAG, "onSaveInstanceState");
+    }
+
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        counterBanners = savedInstanceState.getInt("countBanner");
+        counterVideos = savedInstanceState.getInt("countVideo");
+        Log.d(LOG_TAG, "onRestoreInstanceState");
     }
 }

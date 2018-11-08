@@ -6,7 +6,9 @@ import com.appodeal.ads.Appodeal;
 import com.appodeal.ads.BannerCallbacks;
 
 public class MyBannerCallBacks {
-    public static void init() {
+
+    public static void init(MainActivity mainActivity) {
+
         Appodeal.setBannerCallbacks(new BannerCallbacks() {
 
             @Override

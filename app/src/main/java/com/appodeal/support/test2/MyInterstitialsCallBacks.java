@@ -22,9 +22,7 @@ public class MyInterstitialsCallBacks {
             }
 
             @Override
-            public void onInterstitialClicked() {
-
-            }
+            public void onInterstitialClicked() { }
 
             @Override
             public void onInterstitialClosed() {
